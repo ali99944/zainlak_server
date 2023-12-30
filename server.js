@@ -3,6 +3,7 @@ require("./utils/mongodbConnection");
 const reservationRoutes = require('./routes/reservationRouter');
 const statisticsRoutes = require('./routes/statisticsRouter');
 const managerRoute = require('./routes/managersRoute')
+const path = require('path')
 
 const cors = require('cors')
 
@@ -13,6 +14,9 @@ const port = process.env.PORT || 3000;
 app.use(cors({
   origin:'*',
 }))
+
+
+app.use(express.static(path.join(__dirname, './public')))
 
 
 const userRouter = require('./routes/usersRouter');
