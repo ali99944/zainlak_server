@@ -7,10 +7,29 @@ const path = require('path')
 
 const cors = require('cors')
 
+const { Server } = require('socket.io')
+const http = require('http')
+
 
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
+
+const server = http.createServer(app)
+const io = new Server(server)
+
+
+app.set('io', io)
+  
+io.on('connection', (socket) => {
+  console.log(`a new connection and count is: ${socket.client.conn.server.clientsCount}`)
+
+  
+  socket.on('disconnect', () => {
+      console.log(`User disconnected and count is: ${socket.client.conn.server.clientsCount}`);
+  });
+})
+
 app.use(cors({
   origin:'*',
 }))
@@ -51,4 +70,4 @@ app.get('*',(req,res) =>{
   })
 })
 
-const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+server.listen(port, () => console.log(`Example app listening on port ${port}!`));

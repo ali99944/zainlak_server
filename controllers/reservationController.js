@@ -53,26 +53,19 @@ exports.createReservation = async (req, res) => {
 
     await reservation.save();
 
-    await axios({
-      method:"POST",
-      url:"https://fcm.googleapis.com/fcm/send",
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization': "key=AAAA5lb3yKE:APA91bFuT_Ut9-5Z0wCJUmYEejppMPdXSgpclNC7kRFz_iLU-JTTsgp5HkAJSlRHuI_K1mh-bopwus4DkdiTf3DCSPHotmAtm_rXUffQq22JbltUljY9G8mtp03-vMFss6LFND-nbm3E"
-      },
-      data:{
-        notification:{
-          title:"Zain Development Reservations",
-          body:"Your Reservation Was Created"
-        },
-        to:userData.deviceToken
-      }
-    })
+    const io = req.app.get('io')
 
     let notification = new NotificationModel({
       userId:decodedToken.userId,
       title:"Zain Development Reservations",
       body:"Your Reservation Was Created"
+    })
+
+    io.emit('notification', {
+      notification: {
+        title: 'Zain Development Reservations',
+        body: 'Your Reservation Was Created'
+      }
     })
 
     await notification.save()
