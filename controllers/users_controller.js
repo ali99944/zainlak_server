@@ -83,8 +83,14 @@ exports.deleteAllUsers = async (req, res) =>{
 
 exports.register = async (req, res) => {
   try {
+
     const { name, email, password, location, phone } = req.body;
     console.log(req.body);
+
+    console.log(req.file);
+    if(req.file == null){
+      return res.status(404).send('No image was found')
+    }
 
     const existingUser = await User.findOne({ email: email });
 
