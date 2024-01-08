@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/usersModel');
 const jwt = require('jsonwebtoken');
 const { sendResetPasswordEmail, generateOTP } = require('../utils/emailService');
+const { static_files_host } = require('../configs');
 
 exports.sendResetPasswordEmail = async (req, res) => {
   try {
@@ -227,7 +228,6 @@ exports.updateUser = async (req, res) => {
 
 
 const Technician = require('../models/technicianModel');
-const { static_files_host } = require('../configs');
 
 exports.getAllFavoriteTechnicians = async (req,res) =>{
   try{
