@@ -6,7 +6,7 @@ const multer = require('multer')
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'images/')
+    cb(null, 'public/images/users/')
   },
   filename: (req, file, cb) => {
     cb(null, `${uuid.v4()}-${file.originalname}`)
@@ -22,12 +22,9 @@ router.post('/reset-password/verify', UserController.verifyResetPasswordOTP);
 
 router.get('/users', UserController.getAllUsers);
 
-router.put('/users/:id/uploadImage', upload.single('image'),UserController.uploadImage);
-
-
 router.get('/users/user', UserController.getUser);
 
-router.post('/users', UserController.register);
+router.post('/users',upload.single('image') ,UserController.register);
 router.get('/users/user/notifications', UserController.getUserNotifications)
 
 router.put('/users/:id', UserController.updateUser);

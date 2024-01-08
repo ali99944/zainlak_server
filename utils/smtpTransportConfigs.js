@@ -1,5 +1,7 @@
 const nodemailer = require("nodemailer");
 
+//TODO use Hostinger to send smtp messages
+
 let transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   service:"gmail",

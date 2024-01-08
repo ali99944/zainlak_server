@@ -97,12 +97,14 @@ exports.register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const imageUrl = static_files_host + req.file.path
     const newUser = new User({
       name: name,
       email: email,
       password: hashedPassword,
       location: location,
-      phone:phone
+      phone:phone,
+      image: imageUrl
     });
 
     const savedUser = await newUser.save();
@@ -222,52 +224,10 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-const bucket = require('../utils/firebase')
-
-const uuid = require("uuid");
-const { Storage } = require('@google-cloud/storage');
 
 
-exports.uploadImage = async (req, res) => {
-  try {
-    const userId = req.params.id;
-
-    if (!req.file) {
-      return res.status(400).json({ error: 'No image file provided' });
-    }
-
-    const token = uuid.v4();
-
-    const metadata = {
-      metadata: {
-        // This line is very important. It's to create a download token.
-        firebaseStorageDownloadTokens: token,
-      },
-      contentType: req.file.mimeType,
-      cacheControl: `public, max-age=${Date.now() + 10 * 60 * 60 * 24 * 30 * 365}`,
-    };
-
-    await bucket.upload(`images/${req.file.filename}`, {
-      // Support for HTTP requests made with `Accept-Encoding: gzip`
-      gzip: true,
-      metadata: metadata,
-    });
-
-    const url = `https://firebasestorage.googleapis.com/v0/b/zainfinal-b9de0.appspot.com/o/${req.file.filename}?alt=media&token=${token}5`
-
-
-    let updated = await User.findOneAndUpdate({ _id:userId },{
-      image:url
-    },{ $new:true })
-
-    return res.status(200).json(updated)
-
-  } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-const Technician = require('../models/technicianModel')
+const Technician = require('../models/technicianModel');
+const { static_files_host } = require('../configs');
 
 exports.getAllFavoriteTechnicians = async (req,res) =>{
   try{

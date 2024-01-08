@@ -1,6 +1,6 @@
 const Category = require('../models/categoryModel');
-const uuid = require("uuid");
-const bucket = require("../utils/firebase");
+const { static_files_host } = require('../configs')
+
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find({}, { __v: false });
@@ -22,25 +22,7 @@ exports.createCategory = async (req, res) => {
         return res.status(400).json({ error: 'No image file provided' });
       }
 
-    const token = uuid.v4();
-
-    const metadata = {
-      metadata: {
-        // This line is very important. It's to create a download token.
-        firebaseStorageDownloadTokens: token,
-      },
-      contentType: req.file.mimeType,
-      cacheControl: `public, max-age=${Date.now() + 10 * 60 * 60 * 24 * 30 * 365}`,
-    };
-
-    await bucket.upload(`images/${req.file.filename}`, {
-      // Support for HTTP requests made with `Accept-Encoding: gzip`
-      gzip: true,
-      metadata: metadata,
-    });
-
-    const url = `https://firebasestorage.googleapis.com/v0/b/zainfinal-b9de0.appspot.com/o/${req.file.filename}?alt=media&token=${token}5`
-
+      const url = static_files_host + req.file.path
 
     const category = new Category({
       name: name,

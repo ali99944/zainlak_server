@@ -1,4 +1,3 @@
-require("dotenv").config();
 require("./utils/mongodbConnection");
 const reservationRoutes = require('./routes/reservationRouter');
 const statisticsRoutes = require('./routes/statisticsRouter');
@@ -13,7 +12,6 @@ const http = require('http')
 
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3000;
 
 const server = http.createServer(app)
 const io = new Server(server)
@@ -35,7 +33,7 @@ app.use(cors({
 }))
 
 
-app.use(express.static(path.join(__dirname, './public')))
+app.use('/public',express.static(path.join(__dirname, './public')))
 
 
 const userRouter = require('./routes/usersRouter');
@@ -49,18 +47,19 @@ app.use(bodyParser.json());
 
 const categoryRouter = require('./routes/categoryRouter')
 const otpRouter = require('./routes/otpRouter')
-const popularTechnician = require('./routes/popularTechnicianRouter')
+const productRoute = require('./routes/product_route')
 const informationsRoute = require('./routes/informationsRouter')
 const subCategoriesRouter = require('./routes/subCategoryRouter')
 const NotificationRouter = require('./routes/notificationRouter')
 const SlidersRoute = require('./routes/sliderRouter')
 
-app.use(userRouter,technicianRouter,reservationRoutes,SlidersRoute,categoryRouter,NotificationRouter,otpRouter,popularTechnician,subCategoriesRouter);
+app.use('/api',userRouter,technicianRouter,reservationRoutes,SlidersRoute,categoryRouter,NotificationRouter,otpRouter,productRoute,subCategoriesRouter);
 app.use('/statistics',statisticsRoutes)
 app.use('/managers',managerRoute)
 app.use('/informations',informationsRoute)
 
 const completedReservationRouter = require('./routes/completedReservationRouter');
+const { port } = require("./configs");
 
 app.use('/completedReservations', completedReservationRouter);
 
@@ -70,4 +69,4 @@ app.get('*',(req,res) =>{
   })
 })
 
-server.listen(port, () => console.log(`Example app listening on port ${port}!`));
+server.listen(port, () => console.log(`[Server] listening on port ${port}`));

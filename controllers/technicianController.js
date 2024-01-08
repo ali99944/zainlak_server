@@ -2,6 +2,7 @@ const { log } = require('console');
 const Technician = require('../models/technicianModel');
 const fs = require('fs');
 const Category = require('../models/categoryModel')
+const {static_files_host} = require('../configs')
 
 
 // Create a new technician
@@ -25,25 +26,7 @@ const createTechnician = async (req, res) => {
       return res.status(400).json({ error: 'Email already exists' });
     }
 
-
-    const token = uuid.v4();
-
-    const metadata = {
-      metadata: {
-        // This line is very important. It's to create a download token.
-        firebaseStorageDownloadTokens: token,
-      },
-      contentType: req.file.mimeType,
-      cacheControl: `public, max-age=${Date.now() + 10 * 60 * 60 * 24 * 30 * 365}`,
-    };
-
-    await bucket.upload(`images/${req.file.filename}`, {
-      // Support for HTTP requests made with `Accept-Encoding: gzip`
-      gzip: true,
-      metadata: metadata,
-    });
-
-    const url = `https://firebasestorage.googleapis.com/v0/b/zainfinal-b9de0.appspot.com/o/${req.file.filename}?alt=media&token=${token}5`
+    const url = static_files_host + req.file.path
 
 
 
@@ -119,8 +102,6 @@ const getTechnicianById = async (req, res) => {
   }
 };
 
-const uuid = require('uuid')
-const bucket = require("../utils/firebase");
 
 const updateTechnician = async (req, res) => {
   try {
@@ -142,27 +123,7 @@ const updateTechnician = async (req, res) => {
 
 
   if (file) {
-    const token = uuid.v4();
-
-    const metadata = {
-      metadata: {
-        // This line is very important. It's to create a download token.
-        firebaseStorageDownloadTokens: token,
-      },
-      contentType: req.file.mimeType,
-      cacheControl: `public, max-age=${Date.now() + 10 * 60 * 60 * 24 * 30 * 365}`,
-    };
-
-    await bucket.upload(`images/${req.file.filename}`, {
-      // Support for HTTP requests made with `Accept-Encoding: gzip`
-      gzip: true,
-      metadata: metadata,
-    });
-
-    const url = `https://firebasestorage.googleapis.com/v0/b/zainfinal-b9de0.appspot.com/o/${req.file.filename}?alt=media&token=${token}5`
-
-    urlImage = url;
-    console.log(url)
+    urlImage = existingTechnician.image
   }else{
     urlImage = existingTechnician.image
   }
@@ -170,7 +131,7 @@ const updateTechnician = async (req, res) => {
 
 
 
-    const updatedTechnician = await Technician.findOneAndUpdate(
+    const updatedTechnician = await Technician.updateOne(
       {email:email},
       {
         image:urlImage,
@@ -183,11 +144,10 @@ const updateTechnician = async (req, res) => {
         category: existingCategory._id,
         from:from,
         to:to
-      },
-      { $new: true }
+      }
     );
 
-    if (!updatedTechnician) {
+    if (updatedTechnician.matchedCount == 0) {
       return res.status(500).send("Technician Wasn't Updated")
     }
 

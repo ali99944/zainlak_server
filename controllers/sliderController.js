@@ -1,6 +1,4 @@
 const SliderImageModel = require('../models/sliderImage')
-const uuid = require("uuid");
-const bucket = require("../utils/firebase");
 
 const getAllSliderImages = async (req,res) =>{
     try{
